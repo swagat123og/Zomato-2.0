@@ -1,4 +1,6 @@
 const userModel=require('../models/user.model');
+const bcrypt=require('bcrypt');
+const jwt=require('jsonwebtoken');
 
 async function registerUser(req,res) {
     const{fullname,email,password}=req.body;
@@ -13,6 +15,37 @@ async function registerUser(req,res) {
         })
     };
 
+    // after finding that user not exist we gash the password
+    const hashedPassword=await bcrypt.hash(password,10);
 
+
+    // then we create a user
+    const user = await userModel.create({
+        fullname,
+        email,
+        password:hashedPassword
+    });
+    // cookie is generated and saved
+    const token=await jwt.sign({
+        id:user._id,
+    },"4f0ea6b93756c5e8b2865ffa835c16a7");
+   
+    res.cookie("token",token);
+//    we are sending these to front end
+    res.status(201).json({
+        messsage:"User Registered Succesfully"
+        ,user:{
+            _id:user._id,
+            email:user.email,
+            fullname:user.fullname 
+        }
+    })
+}
+
+async function loginUser(req,res) {
     
 }
+module.exports={
+   registerUser,
+   loginUser
+};
