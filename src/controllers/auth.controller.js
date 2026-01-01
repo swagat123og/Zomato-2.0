@@ -28,7 +28,7 @@ async function registerUser(req,res) {
     // cookie is generated and saved
     const token=await jwt.sign({
         id:user._id,
-    },"4f0ea6b93756c5e8b2865ffa835c16a7");
+    },process.env.JWT_SECRET);
    
     res.cookie("token",token);
 //    we are sending these to front end
@@ -65,7 +65,7 @@ async function loginUser(req,res) {
      // cookie is generated and saved
     const token=await jwt.sign({
         id:user._id,
-    },"4f0ea6b93756c5e8b2865ffa835c16a7");
+    },process.env.JWT_SECRET);
 
     res.cookie("token",token);
     //    we are sending these to front end
@@ -80,9 +80,15 @@ async function loginUser(req,res) {
 
 }
 
-
+async function logoutUser(req,res){
+    res.clearCookie("token");
+    res.status(200).json({
+        message:"User Logged Out Succesfully"
+    })
+}
 
 module.exports={
    registerUser,
-   loginUser
+   loginUser,
+   logoutUser
 };
