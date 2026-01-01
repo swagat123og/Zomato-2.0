@@ -2,6 +2,7 @@ const express = require('express');
 const app=express();
 const cookie_parser=require('cookie-parser');
 const authRoutes=require('./routes/auth.routes');
+const foodRoutes=require('./routes/food.routes');
 
 
 //it is used so that we can read the data coming from the frontend;
@@ -17,5 +18,6 @@ app.get('/',function(req,res){
 //want to use in post man so then after
 //baseurl/api/auth/user/login then it work
 app.use('/api/auth',authRoutes);
+app.use('/api/food',foodRoutes);
 
 module.exports=app;
