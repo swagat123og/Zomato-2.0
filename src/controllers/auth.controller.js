@@ -43,8 +43,45 @@ async function registerUser(req,res) {
 }
 
 async function loginUser(req,res) {
+   const{email,password}=req.body;
+     //finding the user on the basis of email
+    const user = await userModel.findOne({email});
+
+    //funtion to check wether the user exist or not
+    if(!user){
+        return res.status(400).json({
+            messsage:"Invalid Email Or Password"
+        })
+    };
+   // after finding that user exist we compare the password
+    const isPassWordValid = await bcrypt.compare(password,user.password);
     
+    if(!isPassWordValid){
+      return res.status(400).json({
+            messsage:"Invalid Email Or Password"
+        })  
+    }
+
+     // cookie is generated and saved
+    const token=await jwt.sign({
+        id:user._id,
+    },"4f0ea6b93756c5e8b2865ffa835c16a7");
+
+    res.cookie("token",token);
+    //    we are sending these to front end
+    res.status(200).json({
+        messsage:"User LoggedIn Succesfully"
+        ,user:{
+            _id:user._id,
+            email:user.email,
+            fullname:user.fullname 
+        }
+    })
+
 }
+
+
+
 module.exports={
    registerUser,
    loginUser
