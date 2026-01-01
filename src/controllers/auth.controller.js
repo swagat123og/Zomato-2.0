@@ -1,4 +1,5 @@
 const userModel=require('../models/user.model');
+const foodPartnerModel=require('../models/foodpartner.model');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
 
@@ -87,8 +88,98 @@ async function logoutUser(req,res){
     })
 }
 
+async function RegisterFoodPartner(req,res) {
+    const{fullname,email,password}=req.body;
+
+    //finding the user on the basis of email
+    const foodPartnerExist = await foodPartnerModel.findOne({email});
+
+    //funtion to check wether the user exist or not
+    if(foodPartnerExist){
+        return res.status(400).json({
+            messsage:"Food Partner Already Exists"
+        })
+    };
+
+    // after finding that user not exist we gash the password
+    const hashedPassword=await bcrypt.hash(password,10);
+
+
+    // then we create a user
+    const foodPartner= await foodPartnerModel.create({
+        fullname,
+        email,
+        password:hashedPassword
+    });
+
+    // cookie is generated and saved
+    const token=await jwt.sign({
+        id:foodPartner._id,
+    },process.env.JWT_SECRET);
+   
+    res.cookie("token",token);
+     //    we are sending these to front end
+    res.status(201).json({
+        messsage:"Food Partner Registered Succesfully"
+        ,foodPartner:{
+            _id:foodPartner._id,
+            email:foodPartner.email,
+            fullname:foodPartner.fullname 
+        }
+    })
+    
+}
+
+async function loginFoodPartner(req,res) {
+   const{email,password}=req.body;
+     //finding the user on the basis of email
+    const foodPartner = await foodPartnerModel.findOne({email});
+
+    //funtion to check wether the user exist or not
+    if(!foodPartner){
+        return res.status(400).json({
+            messsage:"Invalid Email Or Password"
+        })
+    };
+   // after finding that user exist we compare the password
+    const isPassWordValid = await bcrypt.compare(password,foodPartner.password);
+    
+    if(!isPassWordValid){
+      return res.status(400).json({
+            messsage:"Invalid Email Or Password"
+        })  
+    }
+
+     // cookie is generated and saved
+    const token=await jwt.sign({
+        id:foodPartner._id,
+    },process.env.JWT_SECRET);
+
+    res.cookie("token",token);
+    //    we are sending these to front end
+    res.status(200).json({
+        messsage:"Food Partner LoggedIn Succesfully"
+        ,foodPartner:{
+            _id:foodPartner._id,
+            email:foodPartner.email,
+            fullname:foodPartner.fullname 
+        }
+    })
+
+}
+
+async function logoutFoodPartner(req,res){
+    res.clearCookie("token");
+    res.status(200).json({
+        message:"Food Partner Logged Out Succesfully"
+    })
+}
+
 module.exports={
    registerUser,
    loginUser,
-   logoutUser
+   logoutUser,
+   RegisterFoodPartner,
+   loginFoodPartner,
+   logoutFoodPartner
 };
