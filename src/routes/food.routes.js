@@ -7,7 +7,19 @@ const multer=require('multer');
 const upload = multer({ 
     storage:multer.memoryStorage()
  })
-// (/api/food/) also for protection we used a middleware
-router.post('/',authMiddleWare.authFoodPartnerMiddleWare,upload.single("video"),foodController.createFood);
+//post (/api/food/) also for protection we used a middleware
+router.post('/',
+authMiddleWare.authFoodPartnerMiddleWare,
+upload.single("video"),
+foodController.createFood);
+
+
+//get (/api/food/) also for protection we used a middleware
+router.get('/',
+authMiddleWare.authUserMiddleQare,
+foodController.getFoodItems);
+
+
 
 module.exports=router;
+
