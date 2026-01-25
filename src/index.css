@@ -1,0 +1,21 @@
+    
+@import "tailwindcss";
+
+
+.input {
+  @apply w-full px-4 py-3 rounded-xl 
+  bg-black/20 border border-white/20 
+  text-white placeholder-white/60 
+  outline-none transition
+
+  focus:bg-black/30
+  focus:border-pink-400
+  focus:ring-2 focus:ring-pink-500/60;
+}
+.button {
+  @apply px-6 py-3 rounded-xl 
+  bg-pink-500 text-white 
+  font-semibold hover:bg-pink-600 
+  active:bg-pink-700 
+  transition;
+}
